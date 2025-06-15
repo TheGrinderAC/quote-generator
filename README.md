@@ -1,12 +1,7 @@
----
-title: Quote Generator
-emoji: 😻
-colorFrom: red
-colorTo: red
-sdk: docker
-pinned: false
-license: mit
-short_description: A simple web application that generates random quotes.
----
+# Random Quote Generator
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+This app shows a random quote on load, built with Flask and deployed on Hugging Face Spaces.
+
+**Deployed App**: [https://huggingface.co/spaces/Bidhideb/quote-generator](https://huggingface.co/spaces/Bidhideb/quote-generator)
+
+✅ Deployment is automatically triggered on every push to the GitHub repository! (using huggingface-sync-action)
