@@ -9,8 +9,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3  
 
       - name: Sync with Hugging Face
         uses: nateraw/huggingface-sync-action@v0.0.5
@@ -19,4 +19,4 @@ jobs:
           huggingface_repo_id: Bidhideb/quote-generator
           hf_token: ${{ secrets.HF_TOKEN }}
           repo_type: space
-          space_sdk: Docker
+          space_sdk: docker 
