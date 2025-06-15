@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Generator App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .quote-display {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border-left: 5px solid #667eea;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quote-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #555;
+            font-style: italic;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .add-quote-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #newQuoteInput {
+            flex: 1;
+            min-width: 300px;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #newQuoteInput:focus {
+            border-color: #667eea;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            #newQuoteInput {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Quote Generator</h1>
+        
+        <div class="quote-display">
+            <div class="quote-text" id="quoteText">
+                Click the button below to get an inspiring quote!
+            </div>
+        </div>
+        
+        <button class="btn" onclick="getRandomQuote()" id="getQuoteBtn">
+            Get Random Quote
+        </button>
+        
+        <div class="add-quote-section">
+            <h3 style="color: #333; margin-bottom: 15px;">Add Your Own Quote</h3>
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="newQuoteInput" 
+                    placeholder="Enter your favorite quote with author..."
+                    maxlength="200"
+                >
+                <button class="btn" onclick="addQuote()" id="addQuoteBtn">
+                    Add Quote
+                </button>
+            </div>
+            <div class="message" id="message"></div>
+        </div>
+    </div>
+
+    <script>
+        async function getRandomQuote() {
+            const btn = document.getElementById('getQuoteBtn');
+            const quoteText = document.getElementById('quoteText');
+            
+            btn.textContent = 'Loading...';
+            btn.classList.add('loading');
+            
+            try {
+                const response = await fetch('/api/quote');
+                const data = await response.json();
+                
+                quoteText.textContent = data.quote;
+                quoteText.style.animation = 'fadeIn 0.5s ease-in';
+            } catch (error) {
+                quoteText.textContent = 'Error loading quote. Please try again!';
+                console.error('Error:', error);
+            } finally {
+                btn.textContent = 'Get Random Quote';
+                btn.classList.remove('loading');
+            }
+        }
+
+        async function addQuote() {
+            const input = document.getElementById('newQuoteInput');
+            const btn = document.getElementById('addQuoteBtn');
+            const message = document.getElementById('message');
+            
+            const quoteText = input.value.trim();
+            
+            if (!quoteText) {
+                showMessage('Please enter a quote!', 'error');
+                return;
+            }
+            
+            btn.textContent = 'Adding...';
+            btn.classList.add('loading');
+            
+            try {
+                const response = await fetch('/api/add-quote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ quote: quoteText })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage(`Quote added successfully! Total quotes: ${data.total}`, 'success');
+                    input.value = '';
+                } else {
+                    showMessage(data.error || 'Error adding quote', 'error');
+                }
+            } catch (error) {
+                showMessage('Error adding quote. Please try again!', 'error');
+                console.error('Error:', error);
+            } finally {
+                btn.textContent = 'Add Quote';
+                btn.classList.remove('loading');
+            }
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+
+        // Allow Enter key to add quote
+        document.getElementById('newQuoteInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addQuote();
+            }
+        });
+
+        // Load a quote on page load
+        window.addEventListener('load', getRandomQuote);
+    </script>
+</body>
+</html>
